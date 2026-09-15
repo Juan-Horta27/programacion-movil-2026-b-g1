@@ -1,0 +1,13 @@
+.saludo {
+  margin: 16px;
+}
+
+.saludo__contenido {
+  text-align: center;
+}
+
+.saludo__texto {
+  font-size: 20px;
+  margin: 8px 0 18px;
+  color: var(--ion-text-color);
+}
