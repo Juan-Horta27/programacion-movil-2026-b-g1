@@ -1,0 +1,19 @@
+.partituras {
+  padding-bottom: 20px;
+}
+
+.partituras__boton {
+  margin-top: 16px;
+}
+
+.partituras__ayuda {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.partituras__centro {
+  text-align: center;
+  padding: 24px;
+  color: var(--ion-color-medium);
+}
