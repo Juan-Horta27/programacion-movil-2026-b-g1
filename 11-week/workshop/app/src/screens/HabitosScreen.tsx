@@ -115,7 +115,12 @@ export default function HabitosScreen() {
           titulo="📌 Habitos"
           subtitulo={`${habitos.length} habitos registrados`}
           derecha={
-            <Pressable style={styles.botonAgregar} onPress={() => setModalVisible(true)}>
+            <Pressable
+              style={styles.botonAgregar}
+              onPress={() => setModalVisible(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Crear habito"
+            >
               <Text style={styles.botonAgregarTexto}>+</Text>
             </Pressable>
           }
@@ -163,7 +168,9 @@ export default function HabitosScreen() {
               return (
                 <Card>
                   <View style={styles.encabezado}>
-                    <Text style={styles.icono}>{categoria?.icono ?? '🏷️'}</Text>
+                    <Text style={styles.icono} accessibilityElementsHidden importantForAccessibility="no">
+                      {categoria?.icono ?? '🏷️'}
+                    </Text>
                     <View style={styles.flex}>
                       <Text style={styles.nombre}>{item.nombre}</Text>
                       <Text style={styles.categoria}>{categoria?.nombre ?? 'Sin categoria'}</Text>
@@ -276,8 +283,8 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   lista: { gap: spacing.md, paddingBottom: spacing.xxl },
   botonAgregar: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     borderRadius: radius.pill,
     backgroundColor: colors.teal,
     alignItems: 'center',
@@ -302,7 +309,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border,
   },
   dato: { flex: 1 },
-  datoEtiqueta: { color: colors.subtle, fontSize: fontSize.xs - 1, fontWeight: '700' },
+  datoEtiqueta: { color: colors.subtle, fontSize: fontSize.xs, fontWeight: '700' },
   datoValor: { color: colors.text, fontSize: fontSize.sm, fontWeight: '600', marginTop: 2 },
   botonEliminar: { marginTop: spacing.md },
 

@@ -64,7 +64,12 @@ export default function MetasScreen() {
           titulo="🎯 Metas"
           subtitulo={`${activas} activas de ${metas.length} totales`}
           derecha={
-            <Pressable style={styles.botonAgregar} onPress={() => setModalVisible(true)}>
+            <Pressable
+              style={styles.botonAgregar}
+              onPress={() => setModalVisible(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Crear meta"
+            >
               <Text style={styles.botonAgregarTexto}>+</Text>
             </Pressable>
           }
@@ -173,8 +178,8 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   lista: { gap: spacing.md, paddingBottom: spacing.xxl },
   botonAgregar: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     borderRadius: radius.pill,
     backgroundColor: colors.teal,
     alignItems: 'center',
