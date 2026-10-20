@@ -4,6 +4,7 @@ import {
   FlatList,
   Modal,
   Pressable,
+  RefreshControl,
   StyleSheet,
   Text,
   View,
@@ -43,6 +44,7 @@ export default function HabitosScreen() {
   const [categoriaId, setCategoriaId] = useState<number | null>(null);
   const [error, setError] = useState('');
   const [estadoCarga, setEstadoCarga] = useState<EstadoCarga>('cargando');
+  const [recargando, setRecargando] = useState(false);
 
   const cargarHabitos = useCallback(async () => {
     setEstadoCarga('cargando');
@@ -57,6 +59,17 @@ export default function HabitosScreen() {
   useEffect(() => {
     cargarHabitos();
   }, [cargarHabitos]);
+
+  const recargarHabitos = async () => {
+    setRecargando(true);
+    try {
+      await simularPeticion();
+    } catch {
+      setEstadoCarga('error');
+    } finally {
+      setRecargando(false);
+    }
+  };
 
   const cerrarModal = () => {
     setModalVisible(false);
@@ -125,6 +138,14 @@ export default function HabitosScreen() {
             keyExtractor={(item) => String(item.id)}
             contentContainerStyle={styles.lista}
             showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={recargando}
+                onRefresh={recargarHabitos}
+                tintColor={colors.teal}
+                colors={[colors.teal]}
+              />
+            }
             ListEmptyComponent={
               <EmptyState
                 icono="📌"
