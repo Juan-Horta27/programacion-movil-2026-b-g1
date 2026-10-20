@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -17,10 +17,14 @@ import ChipSelector from '../components/ChipSelector';
 import EmptyState from '../components/EmptyState';
 import Input from '../components/Input';
 import ScreenHeader from '../components/ScreenHeader';
+import SkeletonHabitos from '../components/SkeletonHabitos';
 import { colors, fontSize, radius, spacing } from '../constants/theme';
 import { useApp } from '../context/AppContext';
+import { simularPeticion } from '../services/simulacion';
 
 const FORMULARIO_VACIO = { nombre: '', descripcion: '', unidadMedida: '' };
+
+type EstadoCarga = 'cargando' | 'listo' | 'error';
 
 export default function HabitosScreen() {
   const {
@@ -38,6 +42,21 @@ export default function HabitosScreen() {
   const [form, setForm] = useState(FORMULARIO_VACIO);
   const [categoriaId, setCategoriaId] = useState<number | null>(null);
   const [error, setError] = useState('');
+  const [estadoCarga, setEstadoCarga] = useState<EstadoCarga>('cargando');
+
+  const cargarHabitos = useCallback(async () => {
+    setEstadoCarga('cargando');
+    try {
+      await simularPeticion();
+      setEstadoCarga('listo');
+    } catch {
+      setEstadoCarga('error');
+    }
+  }, []);
+
+  useEffect(() => {
+    cargarHabitos();
+  }, [cargarHabitos]);
 
   const cerrarModal = () => {
     setModalVisible(false);
@@ -89,63 +108,76 @@ export default function HabitosScreen() {
           }
         />
 
-        <FlatList
-          data={habitos}
-          keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={styles.lista}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <EmptyState
-              icono="📌"
-              titulo="Sin habitos"
-              mensaje="Crea tu primer habito para empezar a hacer seguimiento."
-              accion={{ titulo: '+ Crear habito', onPress: () => setModalVisible(true) }}
-            />
-          }
-          renderItem={({ item }) => {
-            const categoria = categoriaPorId(item.categoriaHabitoId);
-            const meta = metaActivaDe(item.id);
-            const racha = rachaDe(item.id);
-            const totalRegistros = registros.filter((r) => r.habitoId === item.id).length;
+        {estadoCarga === 'cargando' && <SkeletonHabitos />}
 
-            return (
-              <Card>
-                <View style={styles.encabezado}>
-                  <Text style={styles.icono}>{categoria?.icono ?? '🏷️'}</Text>
-                  <View style={styles.flex}>
-                    <Text style={styles.nombre}>{item.nombre}</Text>
-                    <Text style={styles.categoria}>{categoria?.nombre ?? 'Sin categoria'}</Text>
+        {estadoCarga === 'error' && (
+          <EmptyState
+            icono="⚠️"
+            titulo="No se pudieron cargar tus habitos"
+            mensaje="Revisa tu conexion e intentalo de nuevo."
+            accion={{ titulo: 'Reintentar', onPress: cargarHabitos }}
+          />
+        )}
+
+        {estadoCarga === 'listo' && (
+          <FlatList
+            data={habitos}
+            keyExtractor={(item) => String(item.id)}
+            contentContainerStyle={styles.lista}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <EmptyState
+                icono="📌"
+                titulo="Sin habitos"
+                mensaje="Crea tu primer habito para empezar a hacer seguimiento."
+                accion={{ titulo: '+ Crear habito', onPress: () => setModalVisible(true) }}
+              />
+            }
+            renderItem={({ item }) => {
+              const categoria = categoriaPorId(item.categoriaHabitoId);
+              const meta = metaActivaDe(item.id);
+              const racha = rachaDe(item.id);
+              const totalRegistros = registros.filter((r) => r.habitoId === item.id).length;
+
+              return (
+                <Card>
+                  <View style={styles.encabezado}>
+                    <Text style={styles.icono}>{categoria?.icono ?? '🏷️'}</Text>
+                    <View style={styles.flex}>
+                      <Text style={styles.nombre}>{item.nombre}</Text>
+                      <Text style={styles.categoria}>{categoria?.nombre ?? 'Sin categoria'}</Text>
+                    </View>
+                    <Badge
+                      texto={item.activo ? 'Activo' : 'Inactivo'}
+                      color={item.activo ? colors.green : colors.muted}
+                    />
                   </View>
-                  <Badge
-                    texto={item.activo ? 'Activo' : 'Inactivo'}
-                    color={item.activo ? colors.green : colors.muted}
+
+                  {item.descripcion ? (
+                    <Text style={styles.descripcion}>{item.descripcion}</Text>
+                  ) : null}
+
+                  <View style={styles.datos}>
+                    <Dato etiqueta="Unidad" valor={item.unidadMedida} />
+                    <Dato
+                      etiqueta="Meta"
+                      valor={meta ? String(meta.valorObjetivo) : '—'}
+                    />
+                    <Dato etiqueta="Racha" valor={`${racha.rachaActual} d`} />
+                    <Dato etiqueta="Registros" valor={String(totalRegistros)} />
+                  </View>
+
+                  <AppButton
+                    titulo="Eliminar"
+                    variante="peligro"
+                    onPress={() => confirmarEliminar(item.id, item.nombre)}
+                    style={styles.botonEliminar}
                   />
-                </View>
-
-                {item.descripcion ? (
-                  <Text style={styles.descripcion}>{item.descripcion}</Text>
-                ) : null}
-
-                <View style={styles.datos}>
-                  <Dato etiqueta="Unidad" valor={item.unidadMedida} />
-                  <Dato
-                    etiqueta="Meta"
-                    valor={meta ? String(meta.valorObjetivo) : '—'}
-                  />
-                  <Dato etiqueta="Racha" valor={`${racha.rachaActual} d`} />
-                  <Dato etiqueta="Registros" valor={String(totalRegistros)} />
-                </View>
-
-                <AppButton
-                  titulo="Eliminar"
-                  variante="peligro"
-                  onPress={() => confirmarEliminar(item.id, item.nombre)}
-                  style={styles.botonEliminar}
-                />
-              </Card>
-            );
-          }}
-        />
+                </Card>
+              );
+            }}
+          />
+        )}
       </View>
 
       <Modal
