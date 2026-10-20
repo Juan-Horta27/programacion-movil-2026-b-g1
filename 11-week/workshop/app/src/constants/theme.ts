@@ -9,7 +9,7 @@ export const colors = {
 
   text: '#E6EDF3',
   muted: '#8B949E',
-  subtle: '#484F58',
+  subtle: '#848D97',
 
   teal: '#2DD4BF',
   green: '#3FB950',
@@ -20,6 +20,18 @@ export const colors = {
   // Fondos suaves para mensajes
   greenSoft: '#162017',
   redSoft: '#2D1517',
+} as const;
+
+/** Tokens semanticos: nombran el uso del color y apuntan a la paleta. */
+export const tokens = {
+  primary: colors.teal,
+  secondary: colors.blue,
+  success: colors.green,
+  error: colors.red,
+  background: colors.bg,
+  surface: colors.surface,
+  text: colors.text,
+  textMuted: colors.muted,
 } as const;
 
 export const spacing = {
