@@ -8,7 +8,7 @@
 - CODE_REPO: https://github.com/code-corhuila/healthy-habits-tracker
 - BASELINE: team app (React Native + Expo SDK 57), copia sin cambios de healthy-habits-tracker, rama main, commit 8a9966f
 - REFLECTION_DOC: https://docs.google.com/document/d/1ndjzBIgDyMyiZcDGTc3vTg145CoPrki_UX1Z7iylmMQ/edit?usp=sharing
-- MY_SCREENS:
+- MY_SCREENS: Hábitos (HabitosScreen, lista que carga datos) y Metas (MetasScreen)
 <!-- CONFIG-END -->
 
 ## Línea base
