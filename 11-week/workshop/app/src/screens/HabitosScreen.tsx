@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
@@ -24,6 +26,7 @@ import Toast from '../components/Toast';
 import { colors, fontSize, radius, spacing } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import { FALLA_GUARDADO, simularPeticion } from '../services/simulacion';
+import type { RootStackParamList } from '../types';
 import { validarHabito, type CamposHabito } from '../utils/validarHabito';
 
 const FORMULARIO_VACIO = { nombre: '', descripcion: '', unidadMedida: '' };
@@ -41,6 +44,7 @@ export default function HabitosScreen() {
     crearHabito,
     eliminarHabito,
   } = useApp();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [form, setForm] = useState(FORMULARIO_VACIO);
@@ -189,6 +193,11 @@ export default function HabitosScreen() {
               const totalRegistros = registros.filter((r) => r.habitoId === item.id).length;
 
               return (
+                <Pressable
+                  onPress={() => navigation.navigate('HabitoDetalle', { id: item.id })}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Ver detalle de ${item.nombre}`}
+                >
                 <Card>
                   <View style={styles.encabezado}>
                     <Text style={styles.icono} accessibilityElementsHidden importantForAccessibility="no">
@@ -225,6 +234,7 @@ export default function HabitosScreen() {
                     style={styles.botonEliminar}
                   />
                 </Card>
+                </Pressable>
               );
             }}
           />

@@ -9,6 +9,9 @@ import HabitosScreen from '../HabitosScreen';
 
 jest.mock('../../services/simulacion', () => ({ simularPeticion: jest.fn() }));
 
+const mockNavigate = jest.fn();
+jest.mock('@react-navigation/native', () => ({ useNavigation: () => ({ navigate: mockNavigate }) }));
+
 const simular = jest.mocked(simularPeticion);
 
 const medidas = {
@@ -47,5 +50,14 @@ describe('HabitosScreen', () => {
 
     expect(await screen.findByText('Beber agua')).toBeTruthy();
     expect(simular).toHaveBeenCalledTimes(2);
+  });
+
+  it('tocar un habito abre su detalle con el id en la ruta', async () => {
+    simular.mockResolvedValue();
+    await renderHabitos();
+
+    fireEvent.press(await screen.findByLabelText('Ver detalle de Beber agua'));
+
+    expect(mockNavigate).toHaveBeenCalledWith('HabitoDetalle', { id: 1 });
   });
 });
