@@ -18,6 +18,7 @@ interface Props {
   tipoTeclado?: KeyboardTypeOptions;
   esContrasena?: boolean;
   multilinea?: boolean;
+  error?: string;
   style?: ViewStyle;
 }
 
@@ -30,6 +31,7 @@ export default function Input({
   tipoTeclado = 'default',
   esContrasena = false,
   multilinea = false,
+  error,
   style,
 }: Props) {
   const [enfocado, setEnfocado] = useState(false);
@@ -39,6 +41,7 @@ export default function Input({
       <Text style={styles.etiqueta}>{etiqueta.toUpperCase()}</Text>
       <TextInput
         value={valor}
+        accessibilityLabel={etiqueta}
         onChangeText={onChange}
         placeholder={placeholder}
         placeholderTextColor={colors.subtle}
@@ -52,8 +55,14 @@ export default function Input({
           styles.campo,
           multilinea ? styles.campoMultilinea : null,
           enfocado ? styles.campoEnfocado : null,
+          error ? styles.campoConError : null,
         ]}
       />
+      {error ? (
+        <Text style={styles.error} accessibilityLiveRegion="polite">
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -84,5 +93,12 @@ const styles = StyleSheet.create({
   },
   campoEnfocado: {
     borderColor: colors.teal,
+  },
+  campoConError: {
+    borderColor: colors.red,
+  },
+  error: {
+    color: colors.red,
+    fontSize: fontSize.sm,
   },
 });

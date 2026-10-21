@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, type ViewStyle } from 'react-native';
 
 import { colors, fontSize, radius, spacing } from '../constants/theme';
 
@@ -10,6 +10,7 @@ interface Props {
   onPress: () => void;
   variante?: Variante;
   deshabilitado?: boolean;
+  cargando?: boolean;
   style?: ViewStyle;
 }
 
@@ -19,13 +20,15 @@ export default function AppButton({
   onPress,
   variante = 'primario',
   deshabilitado = false,
+  cargando = false,
   style,
 }: Props) {
   return (
     <Pressable
       onPress={onPress}
-      disabled={deshabilitado}
+      disabled={deshabilitado || cargando}
       accessibilityRole="button"
+      accessibilityState={{ disabled: deshabilitado || cargando, busy: cargando }}
       style={({ pressed }) => [
         styles.base,
         estilosVariante[variante].contenedor,
@@ -34,7 +37,11 @@ export default function AppButton({
         style,
       ]}
     >
-      <Text style={[styles.texto, estilosVariante[variante].texto]}>{titulo}</Text>
+      {cargando ? (
+        <ActivityIndicator color={estilosVariante[variante].texto.color} />
+      ) : (
+        <Text style={[styles.texto, estilosVariante[variante].texto]}>{titulo}</Text>
+      )}
     </Pressable>
   );
 }
