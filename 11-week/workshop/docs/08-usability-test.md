@@ -52,3 +52,25 @@ De las seis tareas, dos se completaron (la tarea 1 de cada persona) y una quedó
 
 - Mi profesor no pudo escribir en el campo Descripción del formulario, que le apareció deshabilitado. Cuando lo revisé después en mi computador sí me dejó escribir, así que no logré reproducirlo y no lo cuento entre los tres problemas.
 - Mi profesor se equivocó varias veces al elegir la categoría de un hábito.
+
+## Corrección aplicada
+
+Antes de arreglar nada comprobé el problema 3 en el navegador. Con la app como estaba, toqué Eliminar en Hábitos y no pasó nada: siguen los 4 hábitos, no hay pregunta ni mensaje (`img/before-eliminar-sin-respuesta.png`). Con ✕ en Registros pasa lo mismo. Como sí se reprodujo, lo arreglé en Hábitos.
+
+**Qué cambié**
+
+- Eliminar ahora abre mi cuadro de confirmación (`DialogoConfirmacion`, el del CP6) con el nombre del hábito, en lugar de `Alert.alert`, que en el navegador no muestra nada.
+- Si el hábito se borra, sale un aviso verde: `Hábito "Comer fruta" eliminado`.
+- Si no se puede borrar porque tiene registros, sale un aviso rojo con el motivo. Para eso el `Toast` ahora acepta `tipo="error"`.
+
+**Cómo lo comprobé**
+
+- Toqué Eliminar en "Beber agua": aparece la pregunta (`img/after-eliminar-confirmacion.png`). Con Volver no se borra nada y la lista queda en 4.
+- Confirmé el borrado de "Beber agua": aviso rojo, no se puede eliminar porque tiene registros (`img/after-eliminar-no-permitido.png`).
+- Creé el hábito "Comer fruta", que no tiene registros, y lo eliminé: pregunta y aviso verde (`img/after-eliminar-confirmacion-nuevo.png` y `img/after-eliminar-exito.png`).
+- Agregué dos pruebas automáticas en `HabitosScreen.test.tsx` y pasan junto con las otras (5 en total).
+
+**Lo que no arreglé**
+
+- La ✕ de Registros sigue usando `Alert.alert`. Esa pantalla es del otro lado del equipo y no la toqué.
+- Los problemas 1 y 2 (encontrar dónde crear un hábito y guardar un registro) quedan sin corregir en este taller.

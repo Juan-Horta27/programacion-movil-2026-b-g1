@@ -2,7 +2,6 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Alert,
   FlatList,
   Modal,
   Pressable,
@@ -54,6 +53,8 @@ export default function HabitosScreen() {
   const [errorEnvio, setErrorEnvio] = useState('');
   const [confirmarDescarte, setConfirmarDescarte] = useState(false);
   const [avisoExito, setAvisoExito] = useState('');
+  const [avisoError, setAvisoError] = useState('');
+  const [habitoAEliminar, setHabitoAEliminar] = useState<{ id: number; nombre: string } | null>(null);
   const [estadoCarga, setEstadoCarga] = useState<EstadoCarga>('cargando');
   const [recargando, setRecargando] = useState(false);
 
@@ -87,6 +88,7 @@ export default function HabitosScreen() {
   const errorVisible = (campo: keyof CamposHabito) => (tocados[campo] ? errores[campo] : undefined);
   const tocar = (campo: keyof CamposHabito) => setTocados((previos) => ({ ...previos, [campo]: true }));
   const ocultarAviso = useCallback(() => setAvisoExito(''), []);
+  const ocultarAvisoError = useCallback(() => setAvisoError(''), []);
 
   const cerrarModal = () => {
     setModalVisible(false);
@@ -119,20 +121,12 @@ export default function HabitosScreen() {
     }
   };
 
-  const confirmarEliminar = (id: number, nombre: string) => {
-    Alert.alert('Eliminar habito', `¿Eliminar "${nombre}"?`, [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Eliminar',
-        style: 'destructive',
-        onPress: () => {
-          const resultado = eliminarHabito(id);
-          if (!resultado.ok) {
-            Alert.alert('No se puede eliminar', resultado.mensaje);
-          }
-        },
-      },
-    ]);
+  const eliminarConfirmado = () => {
+    if (!habitoAEliminar) return;
+    const resultado = eliminarHabito(habitoAEliminar.id);
+    if (resultado.ok) setAvisoExito(`Habito "${habitoAEliminar.nombre}" eliminado`);
+    else setAvisoError(resultado.mensaje ?? 'No se pudo eliminar el habito.');
+    setHabitoAEliminar(null);
   };
 
   return (
@@ -230,7 +224,7 @@ export default function HabitosScreen() {
                   <AppButton
                     titulo="Eliminar"
                     variante="peligro"
-                    onPress={() => confirmarEliminar(item.id, item.nombre)}
+                    onPress={() => setHabitoAEliminar({ id: item.id, nombre: item.nombre })}
                     style={styles.botonEliminar}
                   />
                 </Card>
@@ -326,7 +320,16 @@ export default function HabitosScreen() {
           onCancelar={() => setConfirmarDescarte(false)}
         />
       </Modal>
+      <DialogoConfirmacion
+        visible={habitoAEliminar !== null}
+        titulo="¿Eliminar este habito?"
+        mensaje={`Vas a eliminar "${habitoAEliminar?.nombre ?? ''}".`}
+        textoConfirmar="Eliminar"
+        onConfirmar={eliminarConfirmado}
+        onCancelar={() => setHabitoAEliminar(null)}
+      />
       <Toast mensaje={avisoExito} onOcultar={ocultarAviso} />
+      <Toast mensaje={avisoError} onOcultar={ocultarAvisoError} tipo="error" duracionMs={4000} />
     </SafeAreaView>
   );
 }

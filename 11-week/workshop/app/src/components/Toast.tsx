@@ -7,10 +7,11 @@ interface Props {
   mensaje: string;
   onOcultar: () => void;
   duracionMs?: number;
+  tipo?: 'exito' | 'error';
 }
 
-/** Aviso breve de exito que se oculta solo (equivalente a IonToast). */
-export default function Toast({ mensaje, onOcultar, duracionMs = 2500 }: Props) {
+/** Aviso breve que se oculta solo (equivalente a IonToast). Verde si sale bien, rojo si no. */
+export default function Toast({ mensaje, onOcultar, duracionMs = 2500, tipo = 'exito' }: Props) {
   useEffect(() => {
     if (!mensaje) return;
     const temporizador = setTimeout(onOcultar, duracionMs);
@@ -18,9 +19,16 @@ export default function Toast({ mensaje, onOcultar, duracionMs = 2500 }: Props) 
   }, [mensaje, onOcultar, duracionMs]);
 
   if (!mensaje) return null;
+  const esError = tipo === 'error';
   return (
-    <View style={styles.toast} accessibilityRole="alert" accessibilityLiveRegion="polite">
-      <Text style={styles.texto}>✓ {mensaje}</Text>
+    <View
+      style={[styles.toast, esError && styles.toastError]}
+      accessibilityRole="alert"
+      accessibilityLiveRegion="polite"
+    >
+      <Text style={styles.texto}>
+        {esError ? '⚠️' : '✓'} {mensaje}
+      </Text>
     </View>
   );
 }
@@ -37,5 +45,6 @@ const styles = StyleSheet.create({
     borderColor: tokens.success,
     backgroundColor: colors.greenSoft,
   },
+  toastError: { borderColor: tokens.error, backgroundColor: colors.redSoft },
   texto: { color: colors.text, fontSize: fontSize.sm, fontWeight: '600', textAlign: 'center' },
 });

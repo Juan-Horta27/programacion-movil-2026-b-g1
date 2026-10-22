@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -59,5 +59,27 @@ describe('HabitosScreen', () => {
     fireEvent.press(await screen.findByLabelText('Ver detalle de Beber agua'));
 
     expect(mockNavigate).toHaveBeenCalledWith('HabitoDetalle', { id: 1 });
+  });
+
+  it('Eliminar pide confirmacion y avisa si el habito tiene registros', async () => {
+    simular.mockResolvedValue();
+    await renderHabitos();
+
+    fireEvent.press((await screen.findAllByText('Eliminar'))[0]);
+    expect(await screen.findByText('¿Eliminar este habito?')).toBeTruthy();
+
+    fireEvent.press(screen.getAllByText('Eliminar').slice(-1)[0]);
+    expect(await screen.findByText(/el habito tiene registros asociados/)).toBeTruthy();
+  });
+
+  it('cancelar la confirmacion no elimina nada', async () => {
+    simular.mockResolvedValue();
+    await renderHabitos();
+
+    fireEvent.press((await screen.findAllByText('Eliminar'))[0]);
+    fireEvent.press((await screen.findAllByText('Volver')).slice(-1)[0]);
+
+    await waitFor(() => expect(screen.queryByText('¿Eliminar este habito?')).toBeNull());
+    expect(screen.getByText('Beber agua')).toBeTruthy();
   });
 });
